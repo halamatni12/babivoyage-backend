@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Models;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Booking extends Model
-{
-    use HasFactory;
+{    use HasFactory;
 
     protected $fillable = [
         'user_id',
@@ -14,23 +14,19 @@ class Booking extends Model
         'booking_date',
         'seat_number',
         'status',
-        'total_price',
-        'insurance_id',
+        'total_amount',
     ];
-
-      public function user()
+        public function user()
     {
         return $this->belongsTo(User::class);
     }
-       public function fligh()
+
+    public function flight()
     {
         return $this->belongsTo(Flight::class);
     }
-         public function insurance()
-    {
-        return $this->belongsTo(Insurance::class);
-    }
-           public function payment()
+
+    public function payment()
     {
         return $this->hasOne(Payment::class);
     }

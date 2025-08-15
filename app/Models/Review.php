@@ -1,20 +1,27 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class File extends Model
+class Review extends Model
 {
-       use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'file_path',
-      'file_type',
+        'flight_id',
+        'rating',
+        'comment',
     ];
-    public function user(){
+
+    public function user()
+    {
         return $this->belongsTo(User::class);
+    }
+
+    public function flight()
+    {
+        return $this->belongsTo(Flight::class);
     }
 }

@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
+        Schema::create('airlines', function (Blueprint $table) {
             $table->id();
-                $table->foreignId('user_id')->constrained()->onDelete('cascade');
-    $table->text('message');
-    $table->string('type', 50); // booking, promo, payment...
-    $table->boolean('is_read')->default(false);
+                    $table->string('name', 150);
+        $table->string('code', 10)->unique(); // e.g. "MEA"
+        $table->string('logo_url')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notifications');
+        Schema::dropIfExists('airlines');
     }
 };

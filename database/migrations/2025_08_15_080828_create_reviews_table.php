@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('files', function (Blueprint $table) {
+        Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-                $table->foreignId('user_id')->constrained()->onDelete('cascade');
-    $table->string('file_path', 255);
-    $table->string('file_type', 50); 
+                    $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        $table->foreignId('flight_id')->constrained()->onDelete('cascade');
+        $table->tinyInteger('rating')->unsigned()->comment('Rating from 1 to 5');
+        $table->text('comment')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('files');
+        Schema::dropIfExists('reviews');
     }
 };
