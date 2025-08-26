@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-
+use Illuminate\Http\Request;             
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
@@ -62,5 +63,41 @@ class LoginController extends Controller
             'role'  => $u->role,
             'phone' => $u->phone,
         ]);
+    }
+         public function showForm()
+    {
+        return view('userside.login');
+    }
+
+    public function loginWeb(Request $request)
+    {
+        $credentials = $request->validate([
+            'email'    => ['required','email'],
+            'password' => ['required','string'],
+        ]);
+
+        $remember = $request->boolean('remember', false);
+
+        // ✅ Always use "web" guard for session login
+        if (Auth::guard('web')->attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('home'))
+                ->with('success', 'Welcome back!');
+        }
+
+        return back()->withErrors([
+            'email' => 'Invalid credentials provided.',
+        ])->onlyInput('email');
+    }
+
+    public function logoutWeb(Request $request)
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home')->with('success', 'You have been logged out.');
     }
 }

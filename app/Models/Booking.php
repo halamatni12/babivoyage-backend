@@ -16,6 +16,9 @@ class Booking extends Model
         'status',
         'total_amount',
     ];
+       protected $casts = [
+        'booking_date' => 'datetime',
+    ];
         public function user()
     {
         return $this->belongsTo(User::class);

@@ -20,7 +20,7 @@ return new class extends Migration
         $table->dateTime('departure_time');
         $table->dateTime('arrival_time');
         $table->decimal('base_price', 10, 2);
-        $table->enum('class', ['economy', 'business', 'first'])->default('economy');
+        $table->enum('class', allowed: ['economy', 'business', 'first'])->default('economy');
             $table->timestamps();
         });
     }
