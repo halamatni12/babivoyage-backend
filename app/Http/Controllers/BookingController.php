@@ -6,7 +6,8 @@ use App\Models\Flight;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use App\Http\Requests\BookingStoreRequest;    
+use App\Http\Requests\BookingUpdateRequest;
 class BookingController extends Controller
 {// Show all bookings for the logged-in user
 public function index()
@@ -113,20 +114,9 @@ public function index()
         return round($subtotal + $ins, 2);
     }
 
-       public function indexapi(Request $request)
+        public function storeapi(BookingStoreRequest $request)
     {
-        return Booking::with('flight')
-            ->where('user_id', $request->user()->id)
-            ->latest()->paginate(20);
-    }
-
-    public function storeapi(Request $request)
-    {
-        $data = $request->validate([
-            'flight_id'   => ['required','exists:flights,id'],
-            'seat_number' => ['nullable','string','max:10'],
-        ]);
-
+        $data   = $request->validated();
         $flight = Flight::findOrFail($data['flight_id']);
 
         $booking = Booking::create([
@@ -135,29 +125,28 @@ public function index()
             'booking_date' => now(),
             'seat_number'  => $data['seat_number'] ?? null,
             'status'       => 'pending',
-            'total_amount' => $flight->base_price, // one seat price
+            'total_amount' => $flight->base_price,
         ]);
 
         return response()->json($booking->load('flight'), 201);
     }
 
+    // API: show booking
     public function showapi(Booking $booking)
     {
         $this->authorizeOwner($booking);
         return $booking->load(['flight','payment']);
     }
 
-    public function update(Request $request, Booking $booking)
+    // API: update booking
+    public function update(BookingUpdateRequest $request, Booking $booking)
     {
         $this->authorizeOwner($booking);
-        $data = $request->validate([
-            'status' => ['sometimes','in:pending,confirmed,cancelled'],
-            'seat_number' => ['sometimes','nullable','string','max:10'],
-        ]);
-        $booking->update($data);
+        $booking->update($request->validated());
         return $booking->load(['flight','payment']);
     }
 
+    // API: delete booking
     public function destroy(Booking $booking)
     {
         $this->authorizeOwner($booking);

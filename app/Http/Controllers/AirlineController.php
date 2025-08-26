@@ -3,32 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Models\Airline;
-use Illuminate\Http\Request;
+use App\Http\Requests\AirlineStoreRequest;
+use App\Http\Requests\AirlineUpdateRequest;
 
 class AirlineController extends Controller
 {
-    public function index(){ return Airline::latest()->paginate(20); }
-
-    public function store(Request $request)
+    public function index()
     {
-        $data = $request->validate([
-            'name'     => ['required','string','max:150'],
-            'code'     => ['required','string','max:10','unique:airlines,code'],
-            'logo_url' => ['nullable','url'],
-        ]);
-        return response()->json(Airline::create($data), 201);
+        return Airline::latest()->paginate(20);
     }
 
-    public function show(Airline $airline){ return $airline->loadCount('flights'); }
-
-    public function update(Request $request, Airline $airline)
+    public function store(AirlineStoreRequest $request)
     {
-        $data = $request->validate([
-            'name'     => ['sometimes','string','max:150'],
-            'code'     => ['sometimes','string','max:10','unique:airlines,code,'.$airline->id],
-            'logo_url' => ['sometimes','nullable','url'],
-        ]);
-        $airline->update($data);
+        return response()->json(Airline::create($request->validated()), 201);
+    }
+
+    public function show(Airline $airline)
+    {
+        return $airline->loadCount('flights');
+    }
+
+    public function update(AirlineUpdateRequest $request, Airline $airline)
+    {
+        $airline->update($request->validated());
         return $airline;
     }
 

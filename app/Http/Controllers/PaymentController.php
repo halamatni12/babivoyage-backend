@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\Payment;
 use Illuminate\Http\Request;
+use App\Http\Requests\PaymentStoreRequest;    
 
 class PaymentController extends Controller
 {
@@ -35,21 +36,16 @@ class PaymentController extends Controller
         return redirect()->route('bookings.show', $booking->id)
                          ->with('success', 'Payment successful! Your booking is confirmed.');
     }
-      public function index(Request $request)
+     public function index(Request $request)
     {
-        return Payment::whereHas('booking', fn($q)=>$q->where('user_id',$request->user()->id))
+        return Payment::whereHas('booking', fn($q) => $q->where('user_id',$request->user()->id))
             ->latest()->paginate(20);
     }
 
-    public function storeapi(Request $request)
+    // API: store payment
+    public function storeapi(PaymentStoreRequest $request)
     {
-        $data = $request->validate([
-            'booking_id' => ['required','exists:bookings,id'],
-            'method'     => ['required','in:credit_card,paypal,bank_transfer,cash'],
-            'amount_paid'=> ['required','numeric','min:0'],
-            'transaction_reference' => ['nullable','string','max:120'],
-            'paid_at'    => ['nullable','date'],
-        ]);
+        $data = $request->validated();
 
         $booking = Booking::findOrFail($data['booking_id']);
         abort_if($booking->user_id !== $request->user()->id, 403, 'Forbidden');
@@ -66,9 +62,11 @@ class PaymentController extends Controller
         return response()->json($payment->load('booking'), 201);
     }
 
+    // API: show payment
     public function show(Payment $payment)
     {
         abort_if(auth()->id() !== $payment->booking->user_id, 403, 'Forbidden');
         return $payment->load('booking');
     }
+
 }

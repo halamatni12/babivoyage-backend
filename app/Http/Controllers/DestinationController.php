@@ -3,33 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Models\Destination;
-use Illuminate\Http\Request;
+use App\Http\Requests\DestinationStoreRequest;
+use App\Http\Requests\DestinationUpdateRequest;
 
 class DestinationController extends Controller
 {
-    public function index() { return Destination::latest()->paginate(20); }
-
-    public function store(Request $request)
+    public function index()
     {
-        $data = $request->validate([
-            'city'    => ['required','string','max:100'],
-            'country' => ['required','string','max:100'],
-        ]);
-        return response()->json(Destination::create($data), 201);
+        return Destination::latest()->paginate(20);
+    }
+
+    public function store(DestinationStoreRequest $request)
+    {
+        return response()->json(Destination::create($request->validated()), 201);
     }
 
     public function show(Destination $destination)
     {
-        return $destination->loadCount(['departures','arrivals']);
+        return $destination;
     }
 
-    public function update(Request $request, Destination $destination)
+    public function update(DestinationUpdateRequest $request, Destination $destination)
     {
-        $data = $request->validate([
-            'city'    => ['sometimes','string','max:100'],
-            'country' => ['sometimes','string','max:100'],
-        ]);
-        $destination->update($data);
+        $destination->update($request->validated());
         return $destination;
     }
 
