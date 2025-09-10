@@ -18,8 +18,20 @@ class Booking extends Model
     ];
        protected $casts = [
         'booking_date' => 'datetime',
+         'total_amount' => 'decimal:2',
+
+        
     ];
-        public function user()
+        protected static function booted()
+    {
+        static::creating(function ($booking) {
+            if (empty($booking->total_amount) && $booking->flight_id) {
+                $booking->total_amount = \App\Models\Flight::whereKey($booking->flight_id)->value('base_price') ?? 0;
+            }
+        });
+    }
+
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
@@ -33,4 +45,6 @@ class Booking extends Model
     {
         return $this->hasOne(Payment::class);
     }
+    public function payments() { return $this->hasMany(\App\Models\Payment::class); }
+
 }

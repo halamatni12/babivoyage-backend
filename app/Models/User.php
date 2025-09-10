@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+// ↓ add these two
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+
+class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -32,7 +36,14 @@ class User extends Authenticatable
         ];
     }
 
-    // If these models exist in App\Models, no import needed.
+    // ===== Filament access gate =====
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // allow only admins (adjust if you add more roles)
+        return $this->role === 'admin';
+    }
+
+    // ===== Relationships =====
     public function bookings()
     {
         return $this->hasMany(Booking::class);
