@@ -143,46 +143,48 @@
       <img data-aos="zoom-in" data-aos-delay="200" src="https://dummyimage.com/110x32/ddd/555&text=Air+France" height="28" alt="Air France" loading="lazy" decoding="async">
     </div>
   </section>
-
-  {{-- Featured Destinations --}}
-  <section id="destinations" class="py-5">
-    <div class="container">
-      <div class="d-flex justify-content-between align-items-end mb-3" data-aos="fade-up">
-        <h2 class="section-title mb-0">Featured Destinations</h2>
-        <a href="#" class="link-primary text-decoration-none">See all</a>
-      </div>
-      <div class="row g-4">
-        @foreach ([
-          ['city'=>'Dubai','code'=>'DXB','img'=>'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d'],
-          ['city'=>'Paris','code'=>'CDG','img'=>'https://images.unsplash.com/photo-1502602898657-3e91760cbb34'],
-          ['city'=>'Istanbul','code'=>'IST','img'=>'https://images.unsplash.com/photo-1544989164-31dc3c645987'],
-          ['city'=>'London','code'=>'LHR','img'=>'https://images.unsplash.com/photo-1462888210965-cdf193fb74fe'],
-          ['city'=>'Rome','code'=>'FCO','img'=>'https://images.unsplash.com/photo-1526481280698-8fcc13fd6721'],
-          ['city'=>'Doha','code'=>'DOH','img'=>'https://images.unsplash.com/photo-1584132967334-10e028bd69f7'],
-        ] as $i => $d)
-        <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ $i*60 }}">
-          <div class="card card-elevate overflow-hidden rounded-4 h-100">
-            <img
-              src="{{ $d['img'] }}?q=60&w=600&auto=format&fit=crop&fm=webp"
-              srcset="{{ $d['img'] }}?q=60&w=480&auto=format&fit=crop&fm=webp 480w,
-                      {{ $d['img'] }}?q=70&w=768&auto=format&fit=crop&fm=webp 768w,
-                      {{ $d['img'] }}?q=80&w=1200&auto=format&fit=crop&fm=webp 1200w"
-              sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 33vw"
-              width="1200" height="220"
-              loading="lazy" decoding="async"
-              class="card-img-top" alt="{{ $d['city'] }}"
-              style="height:220px;object-fit:cover;">
-            <div class="card-img-overlay d-flex flex-column justify-content-end p-3"
-                 style="background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.45) 100%);">
-              <span class="text-white-50 small">{{ $d['code'] }}</span>
-              <strong class="text-white fs-5">{{ $d['city'] }}</strong>
-            </div>
-          </div>
-        </div>
-        @endforeach
-      </div>
+{{-- Featured Destinations --}}
+<section id="destinations" class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-3" data-aos="fade-up">
+      <h2 class="section-title mb-0">Featured Destinations</h2>
+      <a href="{{ route('destinations.index') }}" class="link-primary text-decoration-none">See all</a>
     </div>
-  </section>
+
+    <div class="row g-4">
+      @foreach ($destinations as $i => $d)
+        @php
+          $flightId = \App\Models\Flight::where('departure_id', $defaultOriginId)
+              ->where('arrival_id', $d->id)
+              ->orderBy('departure_time')
+              ->value('id');
+
+          $href = $flightId
+              ? route('flights.show', $flightId)
+              : route('flight.results', ['from_id' => $defaultOriginId, 'to_id' => $d->id]);
+        @endphp
+
+        <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ $i * 60 }}">
+          <a href="{{ $href }}" class="card card-elevate overflow-hidden rounded-4 h-100 text-decoration-none">
+            <img
+              src="{{ asset('image.png') }}" {{-- نفس الصورة لكل المدن --}}
+              alt="{{ $d->city }}"
+              class="card-img-top"
+              style="height:220px;object-fit:cover;">
+
+            <div class="card-img-overlay d-flex flex-column justify-content-end p-2"
+                 style="background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.45) 100%);">
+              <span class="text-white-50 small">{{ $d->code ?? '' }}</span>
+              <strong class="text-white fs-6">{{ $d->city }}</strong>
+            </div>
+          </a>
+        </div>
+      @endforeach
+    </div>
+  </div>
+</section>
+
+
 
   {{-- Why Choose Us --}}
   <section id="why" class="py-5 bg-light">

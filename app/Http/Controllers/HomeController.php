@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Destination;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -9,8 +10,13 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // You can fetch featured destinations / airlines here later if needed.
-        return view('userside.home');
+         $destinations = Destination::take(6)->get();
+
+        // حدد بيروت كـ default origin (إذا موجودة)
+        $defaultOriginId = Destination::where('city', 'Beirut')->value('id')
+            ?? Destination::min('id');
+
+        return view('userside.home', compact('destinations', 'defaultOriginId'));
     }
 
     public function search(Request $request)
